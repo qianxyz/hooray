@@ -45,17 +45,6 @@ impl Vec3 {
     pub fn unit(&self) -> Self {
         *self / self.length()
     }
-
-    pub fn color(&self) -> [u8; 3] {
-        // TODO: this is sketchy
-        assert!(self.0 >= 0.0 && self.0 <= 1.0);
-        assert!(self.1 >= 0.0 && self.1 <= 1.0);
-        assert!(self.2 >= 0.0 && self.2 <= 1.0);
-
-        const M: f32 = 255.999;
-
-        [(M * self.0) as u8, (M * self.1) as u8, (M * self.2) as u8]
-    }
 }
 
 impl ops::Neg for Vec3 {
