@@ -1,3 +1,5 @@
+mod vec3;
+
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
