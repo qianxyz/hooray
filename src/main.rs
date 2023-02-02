@@ -9,7 +9,7 @@ use vec3::Vec3;
 fn main() {
     let path = Path::new(r"image.png");
     let file = File::create(path).unwrap();
-    let ref mut w = BufWriter::new(file);
+    let w = &mut BufWriter::new(file);
 
     const WIDTH: u32 = 256;
     const HEIGHT: u32 = 256;
