@@ -4,6 +4,8 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
+use vec3::Vec3;
+
 fn main() {
     let path = Path::new(r"image.png");
     let file = File::create(path).unwrap();
@@ -21,7 +23,15 @@ fn main() {
     let data: Vec<_> = (0..HEIGHT)
         .flat_map(|row| {
             (0..WIDTH)
-                .flat_map(|col| [row as u8, col as u8, 128])
+                .flat_map(|col| {
+                    let v = Vec3::new(
+                        col as f32 / (WIDTH - 1) as f32,
+                        row as f32 / (HEIGHT - 1) as f32,
+                        0.25,
+                    );
+
+                    v.color()
+                })
                 .collect::<Vec<_>>()
         })
         .collect();
