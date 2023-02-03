@@ -23,8 +23,13 @@ impl Ray {
     }
 
     pub fn color(&self) -> Color {
-        if self.hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5) {
-            return Color::new(1.0, 0.0, 0.0);
+        let center = Point3::new(0.0, 0.0, -1.0);
+        let radius = 0.5;
+
+        let t = self.hit_sphere(center, radius);
+        if t > 0.0 {
+            let n = (self.at(t) - center).unit();
+            return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
         }
 
         let u = self.direction.unit();
@@ -33,15 +38,19 @@ impl Ray {
         (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
     }
 
-    fn hit_sphere(&self, center: Point3, radius: f32) -> bool {
+    fn hit_sphere(&self, center: Point3, radius: f32) -> f32 {
         let oc = self.origin - center;
 
-        let a = self.direction.dot(&self.direction);
-        let b = 2.0 * oc.dot(&self.direction);
-        let c = oc.dot(&oc) - radius * radius;
+        let a = self.direction.length_squared();
+        let half_b = oc.dot(&self.direction);
+        let c = oc.length_squared() - radius * radius;
 
-        let discr = b * b - 4.0 * a * c;
+        let discr = half_b * half_b - a * c;
 
-        discr > 0.0
+        if discr < 0.0 {
+            -1.0
+        } else {
+            (-half_b - discr.sqrt()) / a
+        }
     }
 }
