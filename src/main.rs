@@ -17,7 +17,7 @@ fn main() {
     // image dimensions
     const WIDTH: u32 = 640;
     const HEIGHT: u32 = 360;
-    let aspect_ratio = WIDTH as f32 / HEIGHT as f32;
+    const ASPECT_RATIO: f32 = WIDTH as f32 / HEIGHT as f32;
 
     let mut encoder = png::Encoder::new(w, WIDTH, HEIGHT);
     encoder.set_color(png::ColorType::Rgb);
@@ -26,14 +26,14 @@ fn main() {
     let mut writer = encoder.write_header().unwrap();
 
     // set up camera
-    let viewport_height = 2.0;
-    let viewport_width = viewport_height * aspect_ratio;
-    let focal_length = 1.0;
+    const VIEWPORT_HEIGHT: f32 = 2.0;
+    const VIEWPORT_WIDTH: f32 = VIEWPORT_HEIGHT * ASPECT_RATIO;
+    const FOCAL_LENGTH: f32 = 1.0;
 
     let origin = Point3::new(0.0, 0.0, 0.0);
-    let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-    let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let viewport_center = Point3::new(0.0, 0.0, -focal_length);
+    let horizontal = Vec3::new(VIEWPORT_WIDTH, 0.0, 0.0);
+    let vertical = Vec3::new(0.0, VIEWPORT_HEIGHT, 0.0);
+    let viewport_center = Point3::new(0.0, 0.0, -FOCAL_LENGTH);
     let lower_left_corner = viewport_center - horizontal / 2.0 - vertical / 2.0;
 
     // TODO: remove magic number 3
