@@ -1,3 +1,3 @@
 # Ray Tracing
 
-[tutorial](https://raytracing.github.io/)
+![image](./image.png)
