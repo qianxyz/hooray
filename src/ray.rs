@@ -1,3 +1,4 @@
+use crate::color::RGB;
 use crate::vec3::{Point3, Vec3};
 
 pub struct Ray {
@@ -22,7 +23,7 @@ impl Ray {
         self.origin + t * self.direction
     }
 
-    pub fn color(&self) -> [u8; 3] {
+    pub fn color(&self) -> RGB {
         let u = self.direction.unit();
         let t = 0.5 * (u.y() + 1.0);
 
@@ -32,6 +33,6 @@ impl Ray {
 
         const M: f32 = 255.999;
 
-        [(M * r) as u8, (M * g) as u8, (M * b) as u8]
+        RGB::new((M * r) as u8, (M * g) as u8, (M * b) as u8)
     }
 }

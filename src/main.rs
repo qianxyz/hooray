@@ -1,3 +1,4 @@
+mod color;
 mod ray;
 mod vec3;
 
@@ -35,23 +36,23 @@ fn main() {
     let viewport_center = -Point3::new(0.0, 0.0, focal_length);
     let lower_left_corner = viewport_center - horizontal / 2.0 - vertical / 2.0;
 
-    let data: Vec<_> = (0..HEIGHT)
-        .rev()
-        .flat_map(|row| {
-            (0..WIDTH)
-                .flat_map(|col| {
-                    let u = col as f32 / (WIDTH - 1) as f32;
-                    let v = row as f32 / (HEIGHT - 1) as f32;
+    // TODO: remove magic number 3
+    let mut data = Vec::with_capacity((3 * WIDTH * HEIGHT) as usize);
 
-                    let p = lower_left_corner + u * horizontal + v * vertical;
+    // start from lower left corner, row index reversed
+    for row in (0..HEIGHT).rev() {
+        for col in 0..WIDTH {
+            let u = col as f32 / (WIDTH - 1) as f32;
+            let v = row as f32 / (HEIGHT - 1) as f32;
 
-                    let ray = Ray::new(origin, p - origin);
+            let p = lower_left_corner + u * horizontal + v * vertical;
 
-                    ray.color()
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect();
+            let ray = Ray::new(origin, p - origin);
+            let color = ray.color();
+
+            data.extend(color.as_bytes());
+        }
+    }
 
     writer.write_image_data(&data).unwrap();
 }
