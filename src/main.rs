@@ -33,7 +33,7 @@ fn main() {
     let origin = Point3::new(0.0, 0.0, 0.0);
     let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
-    let viewport_center = -Point3::new(0.0, 0.0, focal_length);
+    let viewport_center = Point3::new(0.0, 0.0, -focal_length);
     let lower_left_corner = viewport_center - horizontal / 2.0 - vertical / 2.0;
 
     // TODO: remove magic number 3
