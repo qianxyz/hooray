@@ -48,10 +48,13 @@ impl Vec3 {
     }
 
     // TODO: this function should only work on color
-    pub fn to_bytes(self) -> [u8; 3] {
-        const M: f32 = 255.999;
+    pub fn color_to_bytes(self, samples_per_pixel: u32) -> [u8; 3] {
+        let scale = 1.0 / samples_per_pixel as f32;
+        let r = (self.0 * scale).clamp(0.0, 0.999) * 256.0;
+        let g = (self.1 * scale).clamp(0.0, 0.999) * 256.0;
+        let b = (self.2 * scale).clamp(0.0, 0.999) * 256.0;
 
-        [(M * self.0) as u8, (M * self.1) as u8, (M * self.2) as u8]
+        [r as u8, g as u8, b as u8]
     }
 }
 
