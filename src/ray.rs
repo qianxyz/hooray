@@ -24,6 +24,10 @@ impl Ray {
     }
 
     pub fn color(&self) -> RGB {
+        if self.hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5) {
+            return RGB::new(255, 0, 0);
+        }
+
         let u = self.direction.unit();
         let t = 0.5 * (u.y() + 1.0);
 
@@ -34,5 +38,17 @@ impl Ray {
         const M: f32 = 255.999;
 
         RGB::new((M * r) as u8, (M * g) as u8, (M * b) as u8)
+    }
+
+    fn hit_sphere(&self, center: Point3, radius: f32) -> bool {
+        let oc = self.origin - center;
+
+        let a = self.direction.dot(&self.direction);
+        let b = 2.0 * oc.dot(&self.direction);
+        let c = oc.dot(&oc) - radius * radius;
+
+        let discr = b * b - 4.0 * a * c;
+
+        discr > 0.0
     }
 }
