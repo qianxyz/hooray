@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-use hooray::{Point3, Ray, Vec3};
+use hooray::{Point3, Ray, Sphere, Vec3, World};
 
 fn main() {
     let path = Path::new(r"image.png");
@@ -19,6 +19,11 @@ fn main() {
     encoder.set_depth(png::BitDepth::Eight);
 
     let mut writer = encoder.write_header().unwrap();
+
+    // prepare world
+    let mut world = World::new();
+    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5));
+    world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0));
 
     // set up camera
     const VIEWPORT_HEIGHT: f32 = 2.0;
@@ -43,7 +48,7 @@ fn main() {
             let p = lower_left_corner + u * horizontal + v * vertical;
 
             let ray = Ray::new(origin, p - origin);
-            let color = ray.color();
+            let color = ray.color(&world);
 
             data.extend(color.to_bytes());
         }
