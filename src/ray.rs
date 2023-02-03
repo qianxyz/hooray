@@ -1,5 +1,4 @@
-use crate::color::RGB;
-use crate::vec3::{Point3, Vec3};
+use crate::{Color, Point3, Vec3};
 
 pub struct Ray {
     origin: Point3,
@@ -23,21 +22,15 @@ impl Ray {
         self.origin + t * self.direction
     }
 
-    pub fn color(&self) -> RGB {
+    pub fn color(&self) -> Color {
         if self.hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5) {
-            return RGB::new(255, 0, 0);
+            return Color::new(1.0, 0.0, 0.0);
         }
 
         let u = self.direction.unit();
         let t = 0.5 * (u.y() + 1.0);
 
-        let r = (1.0 - t) * 1.0 + t * 0.5;
-        let g = (1.0 - t) * 1.0 + t * 0.7;
-        let b = 1.0;
-
-        const M: f32 = 255.999;
-
-        RGB::new((M * r) as u8, (M * g) as u8, (M * b) as u8)
+        (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
     }
 
     fn hit_sphere(&self, center: Point3, radius: f32) -> bool {

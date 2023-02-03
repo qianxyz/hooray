@@ -1,13 +1,8 @@
-mod color;
-mod ray;
-mod vec3;
-
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-use crate::ray::Ray;
-use crate::vec3::{Point3, Vec3};
+use hooray::{Point3, Ray, Vec3};
 
 fn main() {
     let path = Path::new(r"image.png");
@@ -50,7 +45,7 @@ fn main() {
             let ray = Ray::new(origin, p - origin);
             let color = ray.color();
 
-            data.extend(color.as_bytes());
+            data.extend(color.to_bytes());
         }
     }
 

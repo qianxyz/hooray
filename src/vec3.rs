@@ -4,6 +4,7 @@ use std::ops;
 pub struct Vec3(f32, f32, f32);
 
 pub type Point3 = Vec3; // TODO: arithmetic safety (no point + point)
+pub type Color = Vec3; // TODO: omg this is too dangerous
 
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
@@ -44,6 +45,13 @@ impl Vec3 {
 
     pub fn unit(&self) -> Self {
         *self / self.length()
+    }
+
+    // TODO: this function should only work on color
+    pub fn to_bytes(self) -> [u8; 3] {
+        const M: f32 = 255.999;
+
+        [(M * self.0) as u8, (M * self.1) as u8, (M * self.2) as u8]
     }
 }
 
