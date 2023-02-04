@@ -5,24 +5,14 @@ use std::path::Path;
 use hooray::{Camera, Color, Point3, Sphere, World};
 
 use indicatif::ProgressBar;
-use rand::random;
+use rand::random; // TODO: seeding
 
 fn main() {
-    let path = Path::new(r"image.png");
-    let file = File::create(path).unwrap();
-    let w = &mut BufWriter::new(file);
-
     // image dimensions
     const WIDTH: u32 = 640;
     const HEIGHT: u32 = 360;
     const ASPECT_RATIO: f32 = WIDTH as f32 / HEIGHT as f32;
     const SAMPLES_PER_PIXEL: u32 = 100;
-
-    let mut encoder = png::Encoder::new(w, WIDTH, HEIGHT);
-    encoder.set_color(png::ColorType::Rgb);
-    encoder.set_depth(png::BitDepth::Eight);
-
-    let mut writer = encoder.write_header().unwrap();
 
     // prepare world
     let mut world = World::new();
@@ -55,5 +45,15 @@ fn main() {
 
     bar.finish_and_clear();
 
+    // write to png file
+    let path = Path::new(r"image.png");
+    let file = File::create(path).unwrap();
+    let w = &mut BufWriter::new(file);
+
+    let mut encoder = png::Encoder::new(w, WIDTH, HEIGHT);
+    encoder.set_color(png::ColorType::Rgb);
+    encoder.set_depth(png::BitDepth::Eight);
+
+    let mut writer = encoder.write_header().unwrap();
     writer.write_image_data(&data).unwrap();
 }
