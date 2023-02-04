@@ -4,6 +4,7 @@ use std::path::Path;
 
 use hooray::{Camera, Color, Point3, Sphere, World};
 
+use indicatif::ProgressBar;
 use rand::random;
 
 fn main() {
@@ -34,6 +35,8 @@ fn main() {
     // TODO: remove magic number 3
     let mut data = Vec::with_capacity((3 * WIDTH * HEIGHT) as usize);
 
+    let bar = ProgressBar::new((WIDTH * HEIGHT) as u64);
+
     // start from lower left corner, row index reversed
     for row in (0..HEIGHT).rev() {
         for col in 0..WIDTH {
@@ -45,8 +48,12 @@ fn main() {
                 pixel_color += ray.color(&world);
             }
             data.extend(pixel_color.color_to_bytes(SAMPLES_PER_PIXEL));
+
+            bar.inc(1);
         }
     }
+
+    bar.finish_and_clear();
 
     writer.write_image_data(&data).unwrap();
 }
