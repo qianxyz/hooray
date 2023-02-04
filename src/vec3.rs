@@ -1,5 +1,7 @@
 use std::ops;
 
+use crate::random_between;
+
 #[derive(Default, Debug, PartialEq, Clone, Copy)] // TODO: is Copy ok?
 pub struct Vec3(f32, f32, f32);
 
@@ -9,6 +11,18 @@ pub type Color = Vec3; // TODO: omg this is too dangerous
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self(x, y, z)
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let x = random_between(-1.0, 1.0);
+            let y = random_between(-1.0, 1.0);
+            let z = random_between(-1.0, 1.0);
+            let v = Vec3::new(x, y, z);
+            if v.length_squared() < 1.0 {
+                return v;
+            }
+        }
     }
 
     pub fn x(&self) -> f32 {

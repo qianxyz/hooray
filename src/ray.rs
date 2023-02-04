@@ -23,9 +23,15 @@ impl Ray {
         self.origin + t * self.direction
     }
 
-    pub fn color(&self, world: &World) -> Color {
+    pub fn color(&self, world: &World, depth: u32) -> Color {
+        if depth == 0 {
+            return Color::default();
+        }
+
         if let Some(rec) = world.hit(self, 0.0, INF) {
-            return 0.5 * (rec.normal() + Color::new(1.0, 1.0, 1.0));
+            let target = rec.p() + rec.normal() + Vec3::random_in_unit_sphere();
+            let child_ray = Ray::new(rec.p(), target - rec.p());
+            return 0.5 * child_ray.color(&world, depth - 1);
         }
 
         let u = self.direction.unit();

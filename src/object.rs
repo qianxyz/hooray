@@ -8,6 +8,10 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
+    pub fn p(&self) -> Point3 {
+        self.p
+    }
+
     pub fn normal(&self) -> Vec3 {
         self.normal
     }
