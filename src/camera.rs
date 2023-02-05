@@ -8,7 +8,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f32) -> Self {
+    pub fn new(aspect_ratio: f64) -> Self {
         let vp_h = 2.0;
         let vp_w = aspect_ratio * vp_h;
         let foc = 1.0;
@@ -28,7 +28,7 @@ impl Camera {
         }
     }
 
-    pub fn get_ray(&self, u: f32, v: f32) -> Ray {
+    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         Ray::new(
             self.origin,
             self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin,

@@ -3,7 +3,7 @@ use crate::{Point3, Ray, Vec3};
 pub struct HitRecord {
     p: Point3,
     normal: Vec3,
-    t: f32,
+    t: f64,
     is_front: bool,
 }
 
@@ -18,22 +18,22 @@ impl HitRecord {
 }
 
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
 pub struct Sphere {
     center: Point3,
-    radius: f32,
+    radius: f64,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f32) -> Self {
+    pub fn new(center: Point3, radius: f64) -> Self {
         Self { center, radius }
     }
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin() - self.center;
 
         let a = ray.direction().length_squared();
@@ -83,7 +83,7 @@ impl World {
 }
 
 impl Hittable for World {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.objects
             .iter()
             .filter_map(|obj| obj.hit(ray, t_min, t_max))

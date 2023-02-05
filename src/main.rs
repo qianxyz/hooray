@@ -10,7 +10,7 @@ fn main() {
     // image dimensions
     const WIDTH: u32 = 640;
     const HEIGHT: u32 = 360;
-    const ASPECT_RATIO: f32 = WIDTH as f32 / HEIGHT as f32;
+    const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
     const SAMPLES_PER_PIXEL: u32 = 100;
     const MAX_DEPTH: u32 = 50;
 
@@ -32,8 +32,8 @@ fn main() {
         for col in 0..WIDTH {
             let mut pixel_color = Color::default();
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (col as f32 + random_float()) / (WIDTH - 1) as f32;
-                let v = (row as f32 + random_float()) / (HEIGHT - 1) as f32;
+                let u = (col as f64 + random_float()) / (WIDTH - 1) as f64;
+                let v = (row as f64 + random_float()) / (HEIGHT - 1) as f64;
                 let ray = camera.get_ray(u, v);
                 pixel_color += ray.color(&world, MAX_DEPTH);
             }
