@@ -48,8 +48,8 @@ impl Hittable for Sphere {
 
         // find the smaller root in the range
         let root = match ((-half_b - sqrtd) / a, (-half_b + sqrtd) / a) {
-            (t, _) if t >= t_min && t <= t_max => t,
-            (_, t) if t >= t_min && t <= t_max => t,
+            (t, _) if t > t_min && t < t_max => t,
+            (_, t) if t > t_min && t < t_max => t,
             _ => return None,
         };
 
