@@ -48,6 +48,14 @@ impl Vec3 {
         *self - 2.0 * self.dot(n) * (*n)
     }
 
+    pub fn refract(&self, n: &Vec3, ratio: f64) -> Self {
+        let cos = (-self.dot(&n)).min(1.0);
+        let out_prep = ratio * (*self + cos * (*n));
+        let out_para = -(1.0 - out_prep.length_squared()).abs().sqrt() * (*n);
+
+        out_prep + out_para
+    }
+
     pub fn x(&self) -> f64 {
         self.0
     }

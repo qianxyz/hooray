@@ -20,6 +20,10 @@ impl HitRecord<'_> {
     pub fn material(&self) -> &dyn Material {
         self.material
     }
+
+    pub fn is_front(&self) -> bool {
+        self.is_front
+    }
 }
 
 pub trait Hittable {

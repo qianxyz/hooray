@@ -5,7 +5,7 @@ mod ray;
 mod vec3;
 
 pub use camera::Camera;
-pub use material::{Lambertian, Material, Metal};
+pub use material::{Dielectric, Lambertian, Material, Metal};
 pub use object::{Sphere, World};
 pub use ray::Ray;
 pub use vec3::{Color, Point3, Vec3};

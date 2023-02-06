@@ -29,7 +29,7 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Metal::new(Color::new(0.8, 0.8, 0.8), 0.3),
+        Dielectric::new(1.5),
     ));
     world.add(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
