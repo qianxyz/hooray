@@ -29,12 +29,12 @@ fn main() {
     world.add(Sphere::new(
         Point3::new(-1.0, 0.0, -1.0),
         0.5,
-        Metal::new(Color::new(0.8, 0.8, 0.8)),
+        Metal::new(Color::new(0.8, 0.8, 0.8), 0.3),
     ));
     world.add(Sphere::new(
         Point3::new(1.0, 0.0, -1.0),
         0.5,
-        Metal::new(Color::new(0.8, 0.6, 0.2)),
+        Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
     ));
 
     // set up camera
