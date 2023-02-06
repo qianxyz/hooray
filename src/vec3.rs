@@ -38,6 +38,16 @@ impl Vec3 {
         }
     }
 
+    pub fn near_zero(&self) -> bool {
+        const S: f64 = 1e-8;
+
+        self.0.abs() < S && self.1.abs() < S && self.2.abs() < S
+    }
+
+    pub fn reflect(&self, n: &Vec3) -> Self {
+        *self - 2.0 * self.dot(n) * (*n)
+    }
+
     pub fn x(&self) -> f64 {
         self.0
     }

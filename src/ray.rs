@@ -29,11 +29,11 @@ impl Ray {
         }
 
         if let Some(rec) = world.hit(self, 0.001, INF) {
-            // let target = rec.p() + rec.normal() + Vec3::random_in_unit_sphere();
-            let target = rec.p() + rec.normal() + Vec3::random_unit();
-            // let target = rec.p() + rec.normal().random_in_hemisphere();
-            let child_ray = Ray::new(rec.p(), target - rec.p());
-            return 0.5 * child_ray.color(&world, depth - 1);
+            if let Some((attenuation, scattered)) = rec.material().scatter(self, &rec) {
+                return attenuation * scattered.color(&world, depth - 1);
+            } else {
+                return Color::default();
+            }
         }
 
         let u = self.direction.unit();

@@ -1,19 +1,24 @@
-use crate::{Point3, Ray, Vec3};
+use crate::{Material, Point3, Ray, Vec3};
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     p: Point3,
     normal: Vec3,
+    material: &'a dyn Material,
     t: f64,
     is_front: bool,
 }
 
-impl HitRecord {
+impl HitRecord<'_> {
     pub fn p(&self) -> Point3 {
         self.p
     }
 
     pub fn normal(&self) -> Vec3 {
         self.normal
+    }
+
+    pub fn material(&self) -> &dyn Material {
+        self.material
     }
 }
 
@@ -24,11 +29,16 @@ pub trait Hittable {
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    material: Box<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Self { center, radius }
+    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Self {
+        Self {
+            center,
+            radius,
+            material: Box::new(material),
+        }
     }
 }
 
@@ -61,6 +71,7 @@ impl Hittable for Sphere {
         Some(HitRecord {
             p,
             t: root,
+            material: &*self.material,
             normal,
             is_front,
         })
