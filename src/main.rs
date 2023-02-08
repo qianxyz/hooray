@@ -55,7 +55,7 @@ fn main() {
                 let ray = camera.get_ray(u, v);
                 pixel_color += ray.color(&world, MAX_DEPTH);
             }
-            data.extend(pixel_color.color_to_bytes(SAMPLES_PER_PIXEL));
+            data.extend(pixel_color.to_bytes(SAMPLES_PER_PIXEL));
 
             bar.inc(1);
         }

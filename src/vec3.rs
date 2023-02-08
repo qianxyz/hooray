@@ -2,11 +2,8 @@ use std::ops;
 
 use crate::random_between;
 
-#[derive(Default, Debug, PartialEq, Clone, Copy)] // TODO: is Copy ok?
+#[derive(Default, Debug, PartialEq, Clone, Copy)]
 pub struct Vec3(f64, f64, f64);
-
-pub type Point3 = Vec3; // TODO: arithmetic safety (no point + point)
-pub type Color = Vec3; // TODO: omg this is too dangerous
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
@@ -90,16 +87,6 @@ impl Vec3 {
 
     pub fn unit(&self) -> Self {
         *self / self.length()
-    }
-
-    // TODO: this function should only work on color
-    pub fn color_to_bytes(self, samples_per_pixel: u32) -> [u8; 3] {
-        let scale = 1.0 / samples_per_pixel as f64;
-        let r = (self.0 * scale).clamp(0.0, 0.999) * 256.0;
-        let g = (self.1 * scale).clamp(0.0, 0.999) * 256.0;
-        let b = (self.2 * scale).clamp(0.0, 0.999) * 256.0;
-
-        [r as u8, g as u8, b as u8]
     }
 }
 
