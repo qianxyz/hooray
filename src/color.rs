@@ -1,7 +1,15 @@
+//! RGB colors, with float values.
+//!
+//! Representing the RGB components as floats instead of bytes greatly
+//! facilitates computation. Operators from `Vec3` is delegated; A particularly
+//! interesting one is multiplying two colors to get another color, which is
+//! useful in component-wise attenuation.
+
 use std::ops;
 
 use crate::Vec3;
 
+/// A RGB color, with values as float numbers.
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
 pub struct Color(Vec3);
 
@@ -10,6 +18,7 @@ impl Color {
         Self(Vec3::new(x, y, z))
     }
 
+    /// Converts a color to RGB bytes.
     pub fn to_bytes(self, samples_per_pixel: u32) -> [u8; 3] {
         let scale = 1.0 / samples_per_pixel as f64;
         let r = (self.0.x() * scale).clamp(0.0, 0.999) * 256.0;

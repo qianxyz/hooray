@@ -1,56 +1,23 @@
+//! 3D Vectors and algebra.
+//!
+//! Provides overloading for basic vector algebra operators, including:
+//! - Negation (additive inverse) of a vector
+//! - Addition and subtraction of two vectors
+//! - Scaling a vector by a float number
+//! - Element-wise multiplication of two vectors (yield another vector)
+//! - Access of fields by index
+
+// TODO: introduce some `forward_ref` macros for `&Vec3` operations
+
 use std::ops;
 
-use crate::random_between;
-
+/// A 3D Vector.
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
 pub struct Vec3(f64, f64, f64);
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self(x, y, z)
-    }
-
-    pub fn random_in_unit_sphere() -> Self {
-        loop {
-            let x = random_between(-1.0, 1.0);
-            let y = random_between(-1.0, 1.0);
-            let z = random_between(-1.0, 1.0);
-            let v = Vec3::new(x, y, z);
-            if v.length_squared() < 1.0 {
-                return v;
-            }
-        }
-    }
-
-    pub fn random_unit() -> Self {
-        Self::random_in_unit_sphere().unit()
-    }
-
-    pub fn random_in_hemisphere(&self) -> Self {
-        let v = Self::random_in_unit_sphere();
-        if self.dot(&v) > 0.0 {
-            v
-        } else {
-            -v
-        }
-    }
-
-    pub fn near_zero(&self) -> bool {
-        const S: f64 = 1e-8;
-
-        self.0.abs() < S && self.1.abs() < S && self.2.abs() < S
-    }
-
-    pub fn reflect(&self, n: &Vec3) -> Self {
-        *self - 2.0 * self.dot(n) * (*n)
-    }
-
-    pub fn refract(&self, n: &Vec3, ratio: f64) -> Self {
-        let cos = (-self.dot(&n)).min(1.0);
-        let out_prep = ratio * (*self + cos * (*n));
-        let out_para = -(1.0 - out_prep.length_squared()).abs().sqrt() * (*n);
-
-        out_prep + out_para
     }
 
     pub fn x(&self) -> f64 {
@@ -73,20 +40,30 @@ impl Vec3 {
         self.0 * self.0 + self.1 * self.1 + self.2 * self.2
     }
 
+    /// The unit vector along the direction.
+    pub fn unit(&self) -> Self {
+        *self / self.length()
+    }
+
+    /// Checks if vector is close to zero (for numeric stability)
+    pub fn near_zero(&self) -> bool {
+        const S: f64 = 1e-8;
+
+        self.0.abs() < S && self.1.abs() < S && self.2.abs() < S
+    }
+
+    /// The dot product of two vectors.
     pub fn dot(&self, other: &Self) -> f64 {
         self.0 * other.0 + self.1 * other.1 + self.2 * other.2
     }
 
+    /// The cross product of two vectors.
     pub fn cross(&self, other: &Self) -> Self {
         Self(
             self.1 * other.2 - self.2 * other.1,
             self.2 * other.0 - self.0 * other.2,
             self.0 * other.1 - self.1 * other.0,
         )
-    }
-
-    pub fn unit(&self) -> Self {
-        *self / self.length()
     }
 }
 
@@ -131,7 +108,7 @@ impl ops::Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
+        self + (-rhs)
     }
 }
 
@@ -177,8 +154,6 @@ impl ops::Div<f64> for Vec3 {
 
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
-        self.0 /= rhs;
-        self.1 /= rhs;
-        self.2 /= rhs;
+        *self *= 1.0 / rhs
     }
 }

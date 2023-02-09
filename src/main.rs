@@ -40,7 +40,6 @@ fn main() {
     // set up camera
     let camera = Camera::new(ASPECT_RATIO);
 
-    // TODO: remove magic number 3
     let mut data = Vec::with_capacity((3 * WIDTH * HEIGHT) as usize);
 
     let bar = ProgressBar::new((WIDTH * HEIGHT) as u64);
@@ -50,8 +49,8 @@ fn main() {
         for col in 0..WIDTH {
             let mut pixel_color = Color::default();
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (col as f64 + random_float()) / (WIDTH - 1) as f64;
-                let v = (row as f64 + random_float()) / (HEIGHT - 1) as f64;
+                let u = (col as f64 + random::float()) / (WIDTH - 1) as f64;
+                let v = (row as f64 + random::float()) / (HEIGHT - 1) as f64;
                 let ray = camera.get_ray(u, v);
                 pixel_color += ray.color(&world, MAX_DEPTH);
             }

@@ -1,7 +1,22 @@
+//! Points in 3D and affine properties.
+//!
+//! Note that a point differs from a vector in its arithmetic capability:
+//! For example, adding two vectors result in another vector, but adding
+//! two points doesn't make sense mathematically.
+//!
+//! More specifically, a point supports the following operations:
+//! - Adding a vector to a point yields a point (commutatively)
+//! - Subtracting a vector from a point yields a point
+//! - Subtracting a point from a point yields a vector
+//!
+//! As an implementation detail, we use the NewType pattern and delegates its
+//! operator overloading methods to ensure algebraic safety.
+
 use std::ops;
 
 use crate::Vec3;
 
+/// A point in 3D space.
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
 pub struct Point3(Vec3);
 
