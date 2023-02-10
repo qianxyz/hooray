@@ -28,10 +28,22 @@ fn main() {
     world.add(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, metal));
 
     // set up camera
-    let look_from = Point3::new(-2.0, 2.0, 1.0);
+    let look_from = Point3::new(3.0, 3.0, 2.0);
     let look_at = Point3::new(0.0, 0.0, -1.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
-    let camera = Camera::new(look_from, look_at, vup, 20.0, ASPECT_RATIO);
+    let focus_dist = (look_at - look_from).length();
+    let vfov = 20.0;
+    let aperture = 2.0;
+
+    let camera = Camera::new(
+        look_from,
+        look_at,
+        vup,
+        vfov,
+        ASPECT_RATIO,
+        aperture,
+        focus_dist,
+    );
 
     // alloc image data buffer
     let mut data = Vec::with_capacity((3 * WIDTH * HEIGHT) as usize);
