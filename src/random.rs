@@ -2,13 +2,19 @@
 
 // TODO: seeding
 
-use rand;
+use std::sync::Mutex;
+
+use once_cell::sync::Lazy;
+use rand::{self, rngs::StdRng, Rng, SeedableRng};
 
 use crate::{Color, Vec3};
 
+// TODO: StdRng or SmallRng
+static SEED: Lazy<Mutex<StdRng>> = Lazy::new(|| Mutex::new(StdRng::seed_from_u64(42)));
+
 /// Returns a random float in [0, 1).
 pub fn float() -> f64 {
-    rand::random()
+    SEED.lock().unwrap().gen()
 }
 
 /// Returns a random float in [min, max).
