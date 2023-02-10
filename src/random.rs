@@ -4,7 +4,7 @@
 
 use rand;
 
-use crate::Vec3;
+use crate::{Color, Vec3};
 
 /// Returns a random float in [0, 1).
 pub fn float() -> f64 {
@@ -45,4 +45,18 @@ pub fn vec_in_hemisphere(n: Vec3) -> Vec3 {
     } else {
         -v
     }
+}
+
+/// Returns a random color.
+pub fn color() -> Color {
+    Color::new(float(), float(), float())
+}
+
+/// Returns a random color with each RGB component in [min, max).
+pub fn color_between(min: f64, max: f64) -> Color {
+    Color::new(
+        float_between(min, max),
+        float_between(min, max),
+        float_between(min, max),
+    )
 }

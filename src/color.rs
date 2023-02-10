@@ -21,9 +21,11 @@ impl Color {
     /// Converts a color to RGB bytes.
     pub fn to_bytes(self, samples_per_pixel: u32) -> [u8; 3] {
         let scale = 1.0 / samples_per_pixel as f64;
-        let r = (self.0.x() * scale).clamp(0.0, 0.999) * 256.0;
-        let g = (self.0.y() * scale).clamp(0.0, 0.999) * 256.0;
-        let b = (self.0.z() * scale).clamp(0.0, 0.999) * 256.0;
+
+        // NOTE: sqrt is for gamma correction
+        let r = (self.0.x() * scale).sqrt().clamp(0.0, 0.999) * 256.0;
+        let g = (self.0.y() * scale).sqrt().clamp(0.0, 0.999) * 256.0;
+        let b = (self.0.z() * scale).sqrt().clamp(0.0, 0.999) * 256.0;
 
         [r as u8, g as u8, b as u8]
     }
