@@ -1,3 +1,5 @@
+//! A portable camera with aperture simulation.
+
 use crate::{random, Point3, Ray, Vec3};
 
 pub struct Camera {
@@ -74,6 +76,8 @@ impl Camera {
         }
     }
 
+    /// Gets the ray passing through a point in the viewport,
+    /// specified by its relative width and height.
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         // sample offset vector parallel to the viewport plane
         let offset = loop {
