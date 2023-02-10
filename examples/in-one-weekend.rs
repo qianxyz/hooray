@@ -68,10 +68,10 @@ fn random_scene() -> World {
 
 fn main() {
     // image dimensions and render configs
-    const WIDTH: u32 = 600;
-    const HEIGHT: u32 = 400;
+    const WIDTH: u32 = 300;
+    const HEIGHT: u32 = 200;
     const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
-    const SAMPLES_PER_PIXEL: u32 = 100;
+    const SAMPLES_PER_PIXEL: u32 = 10;
     const MAX_DEPTH: u32 = 50;
 
     // prepare world
@@ -129,7 +129,7 @@ fn main() {
     bar.finish();
 
     // write to png file
-    let path = Path::new(r"image.png");
+    let path = Path::new(r"images/in-one-weekend.png");
     let file = File::create(path).unwrap();
     let w = &mut BufWriter::new(file);
 

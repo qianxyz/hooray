@@ -1,3 +1,3 @@
 # Ray Tracing
 
-![](image.png)
+![](images/in-one-weekend.png)
