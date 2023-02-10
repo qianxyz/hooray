@@ -7,7 +7,7 @@ use hooray::*;
 use indicatif::ProgressBar;
 
 fn main() {
-    // image dimensions
+    // image dimensions and render configs
     const WIDTH: u32 = 640;
     const HEIGHT: u32 = 360;
     const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
@@ -16,34 +16,30 @@ fn main() {
 
     // prepare world
     let mut world = World::new();
-    world.add(Sphere::new(
-        Point3::new(0.0, 0.0, -1.0),
-        0.5,
-        Lambertian::new(Color::new(0.7, 0.3, 0.3)),
-    ));
-    world.add(Sphere::new(
-        Point3::new(0.0, -100.5, -1.0),
-        100.0,
-        Lambertian::new(Color::new(0.8, 0.8, 0.0)),
-    ));
-    world.add(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0),
-        0.5,
-        Dielectric::new(1.5),
-    ));
-    world.add(Sphere::new(
-        Point3::new(1.0, 0.0, -1.0),
-        0.5,
-        Metal::new(Color::new(0.8, 0.6, 0.2), 1.0),
-    ));
+
+    let ground = Lambertian::new(Color::new(0.8, 0.8, 0.0));
+    let matte = Lambertian::new(Color::new(0.1, 0.2, 0.5));
+    let metal = Metal::new(Color::new(0.8, 0.6, 0.2), 0.0);
+    let glass = Dielectric::new(1.5);
+
+    world.add(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0, ground));
+    world.add(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5, matte));
+    world.add(Sphere::new(Point3::new(-1.0, 0.0, -1.0), 0.5, glass));
+    world.add(Sphere::new(Point3::new(1.0, 0.0, -1.0), 0.5, metal));
 
     // set up camera
-    let camera = Camera::new(ASPECT_RATIO);
+    let look_from = Point3::new(-2.0, 2.0, 1.0);
+    let look_at = Point3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let camera = Camera::new(look_from, look_at, vup, 20.0, ASPECT_RATIO);
 
+    // alloc image data buffer
     let mut data = Vec::with_capacity((3 * WIDTH * HEIGHT) as usize);
 
+    // init progress bar
     let bar = ProgressBar::new((WIDTH * HEIGHT) as u64);
 
+    // the actual rendering
     // start from lower left corner, row index reversed
     for row in (0..HEIGHT).rev() {
         for col in 0..WIDTH {
@@ -60,6 +56,7 @@ fn main() {
         }
     }
 
+    // clear progress bar
     bar.finish_and_clear();
 
     // write to png file
