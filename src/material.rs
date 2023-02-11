@@ -48,7 +48,7 @@ pub struct Scattered {
 }
 
 /// A material that can scatter incoming rays.
-pub trait Material {
+pub trait Material: Sync {
     /// Given a record of hit and the incoming ray itself,
     /// returns the scatter information (or `None` when it's absorbed).
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Scattered>;

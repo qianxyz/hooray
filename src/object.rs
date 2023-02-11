@@ -44,7 +44,7 @@ pub struct HitRecord<'a> {
 }
 
 /// An object that can be hit by a ray.
-pub trait Object {
+pub trait Object: Sync {
     /// Given an incoming ray and a time interval, returns if there is a hit.
     fn hit_by(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }

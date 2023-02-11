@@ -5,6 +5,7 @@ use std::path::Path;
 use hooray::*;
 
 use indicatif::{ProgressBar, ProgressStyle};
+use rayon::prelude::*;
 
 fn random_scene() -> World {
     let mut world = World::new();
@@ -68,10 +69,10 @@ fn random_scene() -> World {
 
 fn main() {
     // image dimensions and render configs
-    const WIDTH: u32 = 300;
-    const HEIGHT: u32 = 200;
+    const WIDTH: u32 = 600;
+    const HEIGHT: u32 = 400;
     const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
-    const SAMPLES_PER_PIXEL: u32 = 10;
+    const SAMPLES_PER_PIXEL: u32 = 100;
     const MAX_DEPTH: u32 = 50;
 
     // prepare world
@@ -112,13 +113,16 @@ fn main() {
     // start from lower left corner, row index reversed
     for row in (0..HEIGHT).rev() {
         for col in 0..WIDTH {
-            let mut pixel_color = Color::default();
-            for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (col as f64 + random::float()) / (WIDTH - 1) as f64;
-                let v = (row as f64 + random::float()) / (HEIGHT - 1) as f64;
-                let ray = camera.get_ray(u, v);
-                pixel_color += ray.color(&world, MAX_DEPTH);
-            }
+            let pixel_color = (0..SAMPLES_PER_PIXEL)
+                .into_par_iter()
+                .map(|_| {
+                    let u = (col as f64 + random::float()) / (WIDTH - 1) as f64;
+                    let v = (row as f64 + random::float()) / (HEIGHT - 1) as f64;
+                    let ray = camera.get_ray(u, v);
+                    ray.color(&world, MAX_DEPTH)
+                })
+                .reduce(|| Color::default(), |x, y| x + y);
+
             data.extend(pixel_color.to_bytes(SAMPLES_PER_PIXEL));
 
             bar.inc(1);
