@@ -5,13 +5,14 @@ use std::path::Path;
 use hooray::*;
 
 use indicatif::{ProgressBar, ProgressStyle};
+use rand_chacha::{rand_core::SeedableRng, ChaCha8Rng};
 use rayon::prelude::*;
 
-fn random_scene() -> World {
+fn random_scene(rng: &mut impl RngExt) -> World {
     let mut world = World::new();
 
     // add ground
-    let ground_material = Lambertian::new(Color::new(0.5, 0.5, 0.5));
+    let ground_material = Material::lambertian(Color::new(0.5, 0.5, 0.5));
     world.add(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -19,20 +20,20 @@ fn random_scene() -> World {
     ));
 
     // add three big balls
-    let glass = Dielectric::new(1.5);
+    let glass = Material::dielectric(1.5);
     world.add(Sphere::new(Point3::new(0.0, 1.0, 0.0), 1.0, glass));
-    let matte = Lambertian::new(Color::new(0.4, 0.2, 0.1));
+    let matte = Material::lambertian(Color::new(0.4, 0.2, 0.1));
     world.add(Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, matte));
-    let metal = Metal::new(Color::new(0.7, 0.6, 0.5), 0.0);
+    let metal = Material::metal(Color::new(0.7, 0.6, 0.5), 0.0);
     world.add(Sphere::new(Point3::new(4.0, 1.0, 0.0), 1.0, metal));
 
     // add a bunch of small balls
     for a in -11..11 {
         for b in -11..11 {
             let center = Point3::new(
-                a as f64 + 0.9 * random::float(),
+                a as f64 + 0.9 * rng.float(),
                 0.2,
-                b as f64 + 0.9 * random::float(),
+                b as f64 + 0.9 * rng.float(),
             );
 
             // do not collide with the big boys
@@ -44,21 +45,21 @@ fn random_scene() -> World {
             }
 
             // add ball with random material
-            let choose_material = random::float();
+            let choose_material = rng.float();
             if choose_material < 0.8 {
                 // matte
-                let albedo = random::color() * random::color();
-                let material = Lambertian::new(albedo);
+                let albedo = rng.color() * rng.color();
+                let material = Material::lambertian(albedo);
                 world.add(Sphere::new(center, 0.2, material));
             } else if choose_material < 0.95 {
                 // metal
-                let albedo = random::color_between(0.5, 1.0);
-                let fuzz = random::float_between(0.0, 0.5);
-                let material = Metal::new(albedo, fuzz);
+                let albedo = rng.color_between(0.5, 1.0);
+                let fuzz = rng.float_between(0.0, 0.5);
+                let material = Material::metal(albedo, fuzz);
                 world.add(Sphere::new(center, 0.2, material));
             } else {
                 // glass
-                let material = Dielectric::new(1.5);
+                let material = Material::dielectric(1.5);
                 world.add(Sphere::new(center, 0.2, material));
             }
         }
@@ -74,9 +75,11 @@ fn main() {
     const ASPECT_RATIO: f64 = WIDTH as f64 / HEIGHT as f64;
     const SAMPLES_PER_PIXEL: u32 = 100;
     const MAX_DEPTH: u32 = 50;
+    const SEED: u64 = 42;
 
     // prepare world
-    let world = random_scene();
+    let mut rng = ChaCha8Rng::seed_from_u64(SEED);
+    let world = random_scene(&mut rng);
 
     // set up camera
     let look_from = Point3::new(13.0, 2.0, 3.0);
@@ -96,9 +99,6 @@ fn main() {
         focus_dist,
     );
 
-    // alloc image data buffer
-    let mut data = Vec::with_capacity((3 * WIDTH * HEIGHT) as usize);
-
     // init progress bar
     let bar = ProgressBar::new((WIDTH * HEIGHT) as u64);
     bar.set_style(
@@ -111,23 +111,36 @@ fn main() {
 
     // the actual rendering
     // start from lower left corner, row index reversed
-    for row in (0..HEIGHT).rev() {
-        for col in 0..WIDTH {
-            let pixel_color = (0..SAMPLES_PER_PIXEL)
-                .into_par_iter()
-                .map(|_| {
-                    let u = (col as f64 + random::float()) / (WIDTH - 1) as f64;
-                    let v = (row as f64 + random::float()) / (HEIGHT - 1) as f64;
-                    let ray = camera.get_ray(u, v);
-                    ray.color(&world, MAX_DEPTH)
-                })
-                .reduce(|| Color::default(), |x, y| x + y);
+    let data: Vec<_> = (0..HEIGHT)
+        .rev()
+        .collect::<Vec<_>>()
+        .into_par_iter()
+        .flat_map_iter(|row| {
+            let mut rng = ChaCha8Rng::seed_from_u64(SEED);
+            rng.set_stream(row as u64);
 
-            data.extend(pixel_color.to_bytes(SAMPLES_PER_PIXEL));
+            // Partial move hack: The closure below needs to move in `rng`,
+            // but prefixing `move` makes it greedy for all owned values.
+            // We shadow the variables here so it only moves in the borrows.
+            let camera = &camera;
+            let world = &world;
+            let bar = &bar;
 
-            bar.inc(1);
-        }
-    }
+            (0..WIDTH).flat_map(move |col| {
+                bar.inc(1);
+
+                (0..SAMPLES_PER_PIXEL)
+                    .map(|_| {
+                        let u = (col as f64 + rng.float()) / (WIDTH - 1) as f64;
+                        let v = (row as f64 + rng.float()) / (HEIGHT - 1) as f64;
+                        let ray = camera.get_ray(u, v, &mut rng);
+                        ray.color(world, MAX_DEPTH, &mut rng)
+                    })
+                    .fold(Color::default(), |x, y| x + y)
+                    .to_bytes(SAMPLES_PER_PIXEL)
+            })
+        })
+        .collect();
 
     // finish progress bar
     bar.finish();

@@ -1,6 +1,6 @@
 //! A portable camera with aperture simulation.
 
-use crate::{random, Point3, Ray, Vec3};
+use crate::{Point3, Ray, RngExt, Vec3};
 
 pub struct Camera {
     /// The viewpoint.
@@ -78,12 +78,12 @@ impl Camera {
 
     /// Gets the ray passing through a point in the viewport,
     /// specified by its relative width and height.
-    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, u: f64, v: f64, rng: &mut impl RngExt) -> Ray {
         // sample offset vector parallel to the viewport plane
         let offset = loop {
             // sample from the unit disc with rejection method
-            let x = random::float_between(-1.0, 1.0);
-            let y = random::float_between(-1.0, 1.0);
+            let x = rng.float_between(-1.0, 1.0);
+            let y = rng.float_between(-1.0, 1.0);
             if x * x + y * y < 1.0 {
                 break (x * self.horizontal.unit() + y * self.vertical.unit()) * self.lens_radius;
             }

@@ -141,6 +141,7 @@ dependencies = [
  "once_cell",
  "png",
  "rand",
+ "rand_chacha",
  "rayon",
 ]
 

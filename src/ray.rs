@@ -5,7 +5,7 @@
 //! of a ray, which is in turn determined by its interaction with the world.
 
 use crate::object::Object;
-use crate::{Color, Point3, Vec3, World, INF};
+use crate::{Color, Point3, RngExt, Vec3, World, INF};
 
 /// A ray with an origin and a direction.
 pub struct Ray {
@@ -33,7 +33,7 @@ impl Ray {
 
     /// The color of the ray, given an instance of `World`
     /// and a maximum recursion depth.
-    pub fn color(&self, world: &World, depth: u32) -> Color {
+    pub fn color(&self, world: &World, depth: u32, rng: &mut impl RngExt) -> Color {
         // at max depth, return black
         if depth == 0 {
             return Color::default();
@@ -43,10 +43,10 @@ impl Ray {
         // here t_min is set to 0.001 to prevent shadow acne
         // (i.e. the ray hitting its origin on the surface at t=0)
         if let Some(rec) = world.hit_by(self, 0.001, INF) {
-            if let Some(scattered) = rec.material.scatter(self, &rec) {
+            if let Some(scattered) = rec.material.scatter(self, &rec, rng) {
                 // if the ray scatters into a child ray,
                 // returns the attenuated color of the child ray
-                return scattered.attenuation * scattered.ray.color(world, depth - 1);
+                return scattered.attenuation * scattered.ray.color(world, depth - 1, rng);
             } else {
                 // otherwise the ray is absorbed, return black
                 return Color::default();

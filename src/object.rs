@@ -1,7 +1,6 @@
 //! Objects and world.
 
-use crate::material::Material;
-use crate::{Point3, Ray, Vec3};
+use crate::{Material, Point3, Ray, Vec3};
 
 /// A collection of information when a ray hits an object.
 ///
@@ -40,11 +39,11 @@ pub struct HitRecord<'a> {
     pub(crate) is_front: bool,
 
     /// The material of the hit object.
-    pub(crate) material: &'a dyn Material,
+    pub(crate) material: &'a Material,
 }
 
 /// An object that can be hit by a ray.
-pub trait Object: Sync {
+pub trait Object: Sync + Send {
     /// Given an incoming ray and a time interval, returns if there is a hit.
     fn hit_by(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
@@ -52,15 +51,15 @@ pub trait Object: Sync {
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    material: Box<dyn Material>,
+    material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, material: impl Material + 'static) -> Self {
+    pub fn new(center: Point3, radius: f64, material: Material) -> Self {
         Self {
             center,
             radius,
-            material: Box::new(material),
+            material,
         }
     }
 }
@@ -98,7 +97,7 @@ impl Object for Sphere {
             p,
             normal,
             is_front,
-            material: self.material.as_ref(),
+            material: &self.material,
         })
     }
 }
